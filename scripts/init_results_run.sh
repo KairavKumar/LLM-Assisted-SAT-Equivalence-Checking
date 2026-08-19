@@ -2,7 +2,7 @@
 set -euo pipefail
 
 SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
-RESULTS_DIR="$SCRIPT_DIR/results"
+RESULTS_DIR="$SCRIPT_DIR/../results"
 
 ordinal_suffix() {
     local n=$1
@@ -66,5 +66,5 @@ Initialized files:
 
 Example:
 cd "$TARGET_DIR"
-python3 ../../master_final.py --file1 ../../addmult1.bench --file2 ../../addmult2.bench --sub1 "\$(paste -sd, node1.txt)" --sub2 "\$(paste -sd, node2.txt)" --final-cnf final_reduced.cnf --log record.txt
+python3 ../../src/master_final.py --file1 ../../addmult1.bench --file2 ../../addmult2.bench --sub1 "\$(paste -sd, node1.txt)" --sub2 "\$(paste -sd, node2.txt)" --final-cnf final_reduced.cnf --log record.txt
 EOF

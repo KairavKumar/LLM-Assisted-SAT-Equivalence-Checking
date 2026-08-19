@@ -56,7 +56,7 @@ if [ ! -f "$JSON_FILE" ]; then
     exit 1
 fi
 
-python3 "$SCRIPT_DIR/yosys_json_to_bench.py" "$JSON_FILE" --output "$BENCH_FILE" > bench.log 2>&1
+python3 "$SCRIPT_DIR/../src/yosys_json_to_bench.py" "$JSON_FILE" --output "$BENCH_FILE" > bench.log 2>&1
 
 echo "Generated $BENCH_FILE successfully!"
 echo "Mapping written to ${BASENAME}.mapping.json"
