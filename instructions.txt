@@ -1,0 +1,85 @@
+Pipeline Quick-Run Commands (local PC)
+
+0) (Optional) Setup PATH for yosys/kissat/abc
+source ./set_env.sh
+
+1) Create a fresh results run folder
+./init_results_run.sh
+
+2) Enter the new run folder (replace <RUN> with e.g. 6th)
+cd results/<RUN>
+
+3) Put your Verilog(s) in this run folder
+# copy/paste or:
+cp ../../designs/<path>/<designA>.v .
+cp ../../designs/<path>/<designB>.v .
+
+4) Generate BENCH + mapping JSONs (from inside results/<RUN>)
+../../generate_bench.sh ./<designA>.v <top_module_A>
+../../generate_bench.sh ./<designB>.v <top_module_B>
+
+# (you should now have: <designA>.bench/.json/.mapping.json and <designB>.bench/.json/.mapping.json)
+
+5) STEP 1 LLM packet (from inside results/<RUN>)
+python3 ../../prompt/llm_step1_prepare.py \
+  --verilog-a ./<designA>.v \
+  --verilog-b ./<designB>.v \
+  --bench-a ./<designA>.bench \
+  --bench-b ./<designB>.bench \
+  --mapping-a ./<designA>.mapping.json \
+  --mapping-b ./<designB>.mapping.json \
+  --output step1_llm_packet.txt
+
+  
+# Paste step1_llm_packet.txt into LLM
+# Save LLM output JSON as: step1_request.json  (in this same folder)
+
+6) STEP 2 evidence packet (from inside results/<RUN>)
+python3 ../../prompt/llm_step2_prepare.py \
+  --bench-a ./<designA>.bench \
+  --bench-b ./<designB>.bench \
+  --mapping-a ./<designA>.mapping.json \
+  --mapping-b ./<designB>.mapping.json \
+  --json-a ./<designA>.json \
+  --json-b ./<designB>.json \
+  --request-json step1_request.json \
+  --output step2_evidence.txt
+
+# Paste step2_evidence.txt into LLM
+# Save LLM output JSON as: step2_pairs.json  (in this same folder)
+
+7) Extract aligned node lists (from inside results/<RUN>)
+python3 ../../prompt/extract_equivalent_csvs.py \
+  --input step2_pairs.json \
+  --csv-a node1.csv \
+  --csv-b node2.csv
+
+tr ',' '\n' < node1.csv | sed 's/^[[:space:]]*//;s/[[:space:]]*$//' | sed '/^$/d' > node1.txt
+tr ',' '\n' < node2.csv | sed 's/^[[:space:]]*//;s/[[:space:]]*$//' | sed '/^$/d' > node2.txt
+
+8) Run the full pipeline (DeepGate + reduction + SAT) (from inside results/<RUN>)
+python3 ../../master_final.py \
+  --file1 ./<designA>.bench \
+  --file2 ./<designB>.bench \
+  --sub1 "$(paste -sd, node1.txt)" \
+  --sub2 "$(paste -sd, node2.txt)" \
+  --final-cnf final_reduced.cnf \
+  --log record.txt
+
+# Outputs written in results/<RUN>/:
+# - final_reduced.cnf
+# - baseline_miter.cnf
+# - log_result.txt
+# - record.txt (only if you used --log record.txt)
+
+9) Time baseline vs reduced CNF solve (from inside results/<RUN>)
+time kissat baseline_miter.cnf
+time kissat final_reduced.cnf
+Hi Sabrina,
+Just passing along this note from Cultural Vistas. It looks like they are still waiting on the host company's side of the application to be completed.
+
+Would you mind taking a look into this? Let me know if there's anything else you need from my end to help move things along.
+
+Regards,
+Kairav
+

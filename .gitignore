@@ -1,0 +1,13 @@
+*.bench
+*.json
+*.blif
+*.log
+venv/
+__pycache__/
+python-deepgate/
+solvers/
+results/
+cadical-src.tgz
+abc.history
+.DS_Store
+*.pyc
